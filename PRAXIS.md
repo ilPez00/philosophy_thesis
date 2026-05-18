@@ -21,11 +21,11 @@ This system is named for the third. Not because it produces outcomes (though it 
 
 Existing accountability tools fail in one of two ways:
 
-1. **Too weak** — they rely entirely on self-report, with no mechanism to distinguish honest effort from optimistic logging. Progress bars move because the user wills them to.
+1. **Too weak** — rely entirely on self-report. Progress bars move because the user wills them to. No mechanism distinguishes honest effort from optimistic logging.
 
-2. **Too strong** — they impose external monitoring (location tracking, keystroke logging, screen recording) in exchange for accountability. They treat the user as a subject under observation, not an agent with sovereignty over their own data.
+2. **Too strong** — impose external monitoring (location tracking, keystroke logging, screen recording). Treat the user as subject under observation, not agent with sovereignty over their own data.
 
-Praxis proposes a third path: **peer validation**. Effort is graded by humans who have their own goals at stake — collaborators, partners, coaches — not by an algorithm, and not by a panopticon.
+Praxis proposes a third path: **peer validation**. Effort is graded by humans who have their own goals at stake — collaborators, partners, coaches — not by algorithm and not by panopticon.
 
 The community grades effort. The individual retains sovereignty over what is shared.
 
@@ -57,48 +57,70 @@ Postgres        subscriptions        Axiom agent
 
 ### GoalTree
 
-Every user has one GoalTree. It is a directed acyclic graph of GoalNodes.
+One per user. A directed acyclic graph of GoalNodes with prerequisite and parent-child relationships.
 
 ### GoalNode
 
 ```
 id                UUID
-domain            one of 14 domains (from Rachmaninov ontology)
+domain            one of 14 domains (Rachmaninov ontology)
 name              user-defined string
 weight  W_j       0.1–2.0, auto-adjusts via peer feedback
 progress          0.0–1.0
-parentId          optional (for goal decomposition)
-prerequisiteIds   optional (for sequenced goals)
-customDetails     freeform object (units, target, notes)
+parentId          optional (goal decomposition)
+prerequisiteIds   optional (sequenced goals)
+customDetails     freeform (units, target, notes)
 ```
 
 ### Weight Adjustment
 
-Goal weight `W_j` self-calibrates via peer feedback grades:
+Goal weight `W_j` self-calibrates via peer outcome grades:
 
 ```
-W_j(t+1) = W_j(t) × (1 + α × (grade - 0.5))
-
-grade ∈ [0, 1]   (peer-assigned)
-α = 0.1          (learning rate)
+SUCCEEDED        → W × 0.8    (getting easier; reduce focus)
+TRIED_BUT_FAILED → W × 0.95   (marginal reduction)
+MEDIOCRE         → W × 1.1    (needs more attention)
+DISTRACTED       → W × 1.2    (needs more focus)
 ```
 
-A consistently high-graded goal (grade > 0.5) grows in weight. A low-graded goal shrinks. Weight affects how much a check-in moves progress. The community's assessment of effort quality flows back into the goal's influence on the user's aggregate progress.
+A consistently high-outcome goal shrinks in weight — the user is succeeding; less push needed. A chronically stalled goal grows — it needs more attention and heavier investment. Weight modulates how much a check-in moves overall progress.
+
+### Goal Hierarchy Example
+
+```
+Career & Craft (domain)
+├── "Ship Praxis v2" (root, progress=45%)
+│   ├── "Implement matching engine" (completed ✓)
+│   ├── "Build betting system" (in-progress)
+│   └── "Axiom coaching v2" (blocked — prereq above)
+└── "Land consulting client" (root, progress=20%)
+```
+
+### Validity Layers
+
+```
+PERSONAL    self-assessed only; no external validation required
+VALIDATED   ≥1 collaborator has graded ≥3 check-ins
+COMMUNITY   anonymized flow contributed to community wiki
+```
+
+A goal cannot reach VALIDATED by self-report alone. This operationalizes Popper without invoking him: **a goal that has never produced a falsifiable check-in is not a goal — it is an intention.**
 
 ---
 
 ## 5. Check-ins and Grading
 
-A **check-in** is the atomic unit of Praxis. It records:
+A **check-in** is the atomic unit of Praxis:
+
 ```
 goalId · progress_delta · grade · notes · actor_type · agent_name · timestamp
 ```
 
-`actor_type` is one of: `user | agent | axiom | aura`
+`actor_type` ∈ `user | agent | axiom | aura`
 
-This field records *who made the check-in* — the user themselves, Axiom (the AI coach), an Aura sensor event, or an external agent acting on their behalf. The ledger is transparent. The user always knows what touched their goals.
+This field records *who made the check-in*. The ledger is transparent. The user always knows what touched their goals.
 
-### Grading Schema
+### Grade Rationale Schema
 
 ```
 COMPLETENESS   Did they do what they said they would do?
@@ -107,49 +129,118 @@ OUTCOME        Did the action produce the intended result?
 CONSISTENCY    Is this part of a sustained pattern?
 ```
 
-Grades are assigned by collaborators who have their own goals — not neutral observers, but stakeholders. This creates epistemic accountability: the grader's own credibility is at stake in their assessment.
+Grades are assigned by collaborators with their own goals at stake — not neutral observers, but stakeholders. The grader's credibility is implicated in their assessment.
 
 ---
 
-## 6. Validity Layers
+## 6. Social Mechanics
 
-Praxis distinguishes between goals at different maturity levels:
+### Sparring (Accountability Partners)
 
 ```
-PERSONAL    → self-assessed only; no external validation required
-VALIDATED   → at least one collaborator has graded ≥3 check-ins
-COMMUNITY   → anonymized flow contributed to community wiki
+User A ──request──► User B
+                    (7-day expiry)
+User B ──accept──► SparringPartner created
+                   node_id_a ↔ node_id_b
+                  → mutual progress notifications
+                  → partner check-in prompts
 ```
 
-A goal cannot be declared VALIDATED by self-report alone. This is not a technical restriction — it is a philosophical one. Self-belief that has never been tested by external reality is not knowledge. It is hypothesis.
+Two people bind a shared goal node. Each becomes witness to the other's effort. Not competition — mutual commitment.
 
-The system operationalizes Karl Popper without invoking him: **a goal that has never produced a falsifiable check-in is not a goal. It is an intention.**
+### Duels
+
+```
+User A challenges User B (or random match)
+  title · category · stakePP · deadlineDays · goalNodeId
+         │
+         ▼
+DuelResolutionCron (nightly)
+  both users check-in progress
+  higher relative progress wins
+  winner receives loser's stakePP
+  Stripe handles real-money variant
+```
+
+Duels convert private goals into public contests. Skin in the game — PP or real currency — makes commitment costly and therefore credible.
+
+### Team Challenges
+
+```
+Team (up to N members)
+  title · domain · stakePP/member · deadline
+  ├── member 1 check-ins
+  ├── member 2 check-ins
+  └── member N check-ins
+  → aggregate progress vs deadline
+  → completion: all members gain XP + badge
+  → failure: stakePP redistributed to achievers
+```
+
+Collective commitment device. A team that fails together redistributes stakes to those who delivered.
+
+### Accountability Bets (Stripe)
+
+Real stakes change behavior. Ariely et al. on commitment devices: financial stakes increase follow-through ~40% vs. no stakes.
+
+```
+User commits goal + deadline + real €
+  opponentType: 'self' | 'duel'
+  stakeAmount: € (Stripe PaymentIntent held in escrow)
+       │
+  on deadline:
+  ├── success → stake returned + PP bonus
+  └── failure → stake → partner / charitable pool
+               (5–10% Praxis fee)
+```
+
+This is not gamification. It is **skin in the game** — the mechanism by which a preference becomes a commitment.
+
+### Matching Engine
+
+```
+MatchingEngineService.calculateCompatibilityScore(treeA, treeB):
+  domainScore    = Jaccard(domainsA, domainsB)          × 0.60
+  progressScore  = 1 - |avgProgressA - avgProgressB|    × 0.25
+  structureScore = avg(depthSimilarity, countSimilarity) × 0.15
+  → compatibility ∈ [0, 1]
+```
+
+Suggests accountability partners with overlapping domains and similar momentum. SAB: Similarity (domains), Affinity (progress parity), Behavior (check-in consistency). The goal is not to match by personality — it is to match by where you are in the same kind of struggle.
 
 ---
 
-## 7. Axiom — The AI Coach
+## 7. Axiom — The AI Agent
 
-Axiom is the resident AI agent in Praxis. It does not replace the human in the accountability loop — it enhances it.
+Axiom is Praxis's agentic AI. Runs nightly on all active users; available on-demand in conversation.
 
-### What Axiom Does
+### Nightly Scan (AxiomUnifiedScanService)
 
 ```
-Daily brief:
-  reads user's active goals, recent check-ins, grades
-  reads Rachmaninov ontology (which domain, which score axis)
-  reads ACT stats (consistency, trend, stagnation)
-  reads community wiki (anonymized: what worked for archetype X in domain Y)
-  → proposes today's actions via Rachmaninov.proposeDay()
-  → one specific, measurable action per goal
-  → delivered as voice/text brief through Aura
-
-Agent tools available to Axiom:
-  create_checkin(goalId, progressDelta, grade, notes)
-  update_goal(goalId, fields)
-  dispatch_job(deviceSlug, jobType, payload)  ← Lattice integration
-  read_activity()
-  list_goals()
+User context (goals, check-ins, notebook, wiki, trackers)
+       │
+       ▼
+AxiomProgressEstimationService  → progress % from trackers
+AxiomDailySummaryService        → distill day's check-ins
+AxiomPersonaService             → build/update psychological profile
+AxiomLearningService            → detect: which methods work, what causes failure
 ```
+
+### On-Demand (Conversational)
+
+```
+AxiomAgentController
+├── AICoachingService (Gemini + persona context)
+├── AxiomWikiSearchService (semantic community wiki)
+├── AxiomMultimodalService (image/audio input)
+└── Tool calls (agentic):
+      create_bet · create_duel · create_team_challenge
+      log_tracker · create_goal · update_goal_progress
+      create_notebook_entry · push_notification · suggest_match
+      dispatch_job  ← Lattice (physical device dispatch)
+```
+
+All tool calls pass through `AxiomActionRouter` (Zod schema validation) → `AxiomActionExecutor` → audit log.
 
 ### The dispatch_job Tool
 
@@ -157,20 +248,21 @@ Axiom can submit physical jobs to any device in the Lattice network:
 
 ```
 User: "Axiom, I finished the CAD model. Print the bracket."
-Axiom: → dispatch_job(deviceSlug="workshop-3d-printer", jobType="print_file",
+Axiom: → dispatch_job(deviceSlug="workshop-3d-printer",
+                       jobType="print_file",
                        payload={file: "bracket_v2.stl"})
-      → creates job in device_jobs table
+      → job written to device_jobs table (submitted_by='axiom')
       → device agent polls, downloads, executes
       → status callback → Axiom confirms to user
 ```
 
-This closes the loop: a goal about building something can, via Axiom, directly trigger the physical production step.
+A goal about building something can, via Axiom, directly trigger the physical production step.
 
 ---
 
 ## 8. The Lattice — Physical World Network
 
-Lattice is Praxis's physical device layer. Any machine — CNC mill, 3D printer, computer, smart home hub, camera, server — can be registered as a Lattice node.
+Any machine — CNC mill, 3D printer, computer, smart home hub, camera, server — can be registered as a Lattice node.
 
 ### Device Registration
 
@@ -179,106 +271,139 @@ POST /api/lattice/devices/register
   Authorization: Bearer <user_jwt>
   { name, slug, type, capabilities[] }
 
-Response: { id, apiKey: "dk_..." }
+→ { id, apiKey: "dk_..." }
 ```
 
-The device receives a `dk_*` key (not a JWT). This key is used for all device-to-server communication — heartbeats, job polls, status updates.
+The device receives a `dk_*` key (not JWT). Used for all device-to-server communication.
 
 ### Device Types
 
 ```
-3dprinter · cnc_mill · computer · smart_home
-wearable  · camera   · server   · custom
+3dprinter · cnc_mill · computer · smart_home · wearable · camera · server · custom
 ```
 
 ### Job Lifecycle
 
 ```
+submitted_by: user | axiom | aura | mcp
+
 PENDING → RUNNING → DONE
                  ↘ FAILED
          ← CANCELLED (if still pending)
+
+fields: type · payload JSON · progress_pct (0–100)
+        result JSON · error_msg · started_at · completed_at
 ```
 
-```
-device_jobs:
-  id · device_id · goal_id? · type · payload JSON
-  status · submitted_by (user|axiom|aura|mcp)
-  progress_pct (0–100) · result JSON · error_msg
-  created_at · started_at · completed_at
-```
-
-`submitted_by` records provenance. When Axiom dispatches a job, `submitted_by='axiom'` is written. When Aura voice-dispatches, `submitted_by='aura'`. The physical job ledger is as transparent as the goal ledger.
+`submitted_by` records provenance. When Axiom dispatches, `submitted_by='axiom'`. When Aura voice-dispatches, `submitted_by='aura'`. The physical job ledger is as transparent as the goal ledger.
 
 ### Device Agent Protocol (demo_device.py)
 
-Any device runs a polling agent:
 ```python
-register() → receive dk_* key
-heartbeat_loop() → POST /lattice/devices/heartbeat (30s interval)
-poll_loop() → POST /lattice/jobs/poll (10s interval)
-execute_job(job) → simulate/execute work, PATCH status every step
-SIGINT → mark device offline
+register()        → receive dk_* key
+heartbeat_loop()  → POST /lattice/devices/heartbeat (30s)
+poll_loop()       → POST /lattice/jobs/poll (10s)
+execute_job(job)  → simulate/execute, PATCH status per step
+SIGINT            → mark device offline
 ```
 
 ---
 
-## 9. Personal Agent Tokens (PAT)
-
-Praxis supports named agents acting on behalf of a user — not just Axiom, but any external system (Aura, a custom script, an MCP client):
+## 9. Agent System (External Integrations)
 
 ```
-POST /api/agents/keys/personal
-  Authorization: Bearer <user_jwt>
-  { agentLabel: "aura-field" }
+Agent connects:
+  GET /api/agent/:slug/connect → one-time connect code → user authorizes in-app
 
-Response: { key: "pk_live_..." }
+Agent calls API:
+  x-api-key: pk_live_...
+  → authenticateToken resolves to userId + agentLabel
+  → actor_type='agent', agent_name='aura-field' written on every checkin
+
+Personal Agent Token (PAT):
+  POST /api/agents/keys/personal { agentLabel }
+  → pk_live_...
+
+MCP Server (praxis-mcp-server/):
+  Tools: get_goals · post_checkin · update_progress
+         search_wiki · get_daily_summary
+  → Claude Desktop, VS Code Copilot, any MCP client
 ```
 
-The PAT is used like a JWT but carries `actor_type='agent'` and `agent_name='aura-field'`. Every check-in or job dispatch using this token is attributed to the named agent in the activity ledger.
-
-This enables **multi-agent accountability**: a user's goals can be touched by Axiom, by Aura, by external services — and every touch is recorded, attributed, and auditable by the user.
+**Aura is an agent.** It authenticates with a PAT, posts check-ins, patches goal progress, reads active goals. Every touch attributed to `actor_type='aura'` in the ledger.
 
 ---
 
-## 10. The Community Dimension
-
-The full Praxis vision includes a community layer that Rachmaninov enables:
+## 10. Community Wiki
 
 ```
-Individual goal wiki
-       │ anonymization (names, locations, biometrics stripped)
+Personal wiki (Aura, local, private)
+       │ user opt-in per goal
+       │ anonymization (names/places/IDs stripped)
        ▼
-Community wiki (domain X, archetype Y: what actions produced grade ≥0.8?)
-       │ Axiom reads
+Goal wiki (Praxis DB, per-user, private)
+       │ AxiomWikiWriterService (nightly)
+       │ distill to will→action→effect flow
        ▼
-Compressed insight: "Users matching archetype Y in domain X
-  who do 5×5 strength work 3x/week outperform daily cardio by 0.3σ"
-       │ injected into Axiom coaching prompt
-       ▼
-Better daily proposals for all users in that domain
+Community wiki (global, anonymized, AI-edited)
+       │
+       ├── AxiomWikiSearchService: reads for coaching context
+       ├── Axiom: writes back compressed insights
+       └── Future: training corpus for Rachmaninov model
 ```
 
-No individual record is ever accessible in the community layer. The community wiki contains only anonymized `will → action → effect` flows — causal patterns with all identifying information removed.
-
-The epistemological claim: **the community's aggregate experience is a commons. Individual experience is private property.** Rachmaninov is the property boundary.
+Not a user-facing feature. An inference substrate. Axiom reads it silently to answer: "what works for people in domain X trying to do Y?" No individual record is ever accessible. The community wiki contains only anonymized `will → action → effect` flows.
 
 ---
 
-## 11. Bets and Commitments
+## 11. Psychological Framework
 
-Praxis allows users to place financial stakes on goals:
+Axiom uses psychological models as **context, not diagnosis**:
 
-- **Bet with self**: "If I don't complete X by date Y, I donate €Z to cause C"
-- **Bet with partner**: "We each commit €Z. The one with higher graded progress wins"
-- **Public commitment**: goal + stake publicly declared; community grades outcome
+- **Big Five** — openness, conscientiousness, extraversion, agreeableness, neuroticism → coaching tone adjustment
+- **Jungian archetypes** — Hero, Sage, Explorer, Creator, Caregiver... → goal framing language
+- **DSM-5 (contextual)** — identify self-sabotage loops; not diagnose
 
-Stakes are held via Stripe, disbursed automatically on goal resolution.
+Applications:
+- Frame advice in the user's own symbolic language
+- Identify recurrent stagnation patterns
+- Suggest alternative methods when current approach fails
+- Adjust Axiom "harshness" setting (gentle ↔ direct)
 
-This is not gamification. It is **skin in the game** — the mechanism by which commitment becomes costly and therefore credible. A costless commitment is not a commitment. It is a preference.
+Profile builds passively from check-in language, failure patterns, and response to coaching styles. **Never exposed. Never shared.** Used only per-user, on-device and per-user server context.
 
 ---
 
-## 12. Technical Stack
+## 12. Notebook (Personal Log)
+
+Structured journal tightly coupled to goals:
+
+```
+Entry types: note | journal | reflection | goal_progress
+Tags: domain + goal
+Export: PDF via NarrativePdfRenderer / NotebookPdfRenderer
+```
+
+Axiom reads notebook context before every coaching session. The journal is not decoration — it is the qualitative layer that explains the quantitative check-in record.
+
+---
+
+## 13. Gamification
+
+```
+PP (Praxis Points)  currency for bets and duels
+XP                  experience points, drives level rank
+Streak              consecutive daily check-in days
+Quests              daily/weekly challenges per domain
+Badges              unlocked by milestones
+Leaderboard         opt-in, domain-filtered
+```
+
+Gamification is not the product. It is the social coordination layer that makes check-ins feel worth doing on days when abstract goals feel remote.
+
+---
+
+## 14. Technical Stack
 
 | Component | Technology |
 |---|---|
@@ -287,9 +412,10 @@ This is not gamification. It is **skin in the game** — the mechanism by which 
 | Database | Supabase (PostgreSQL + RLS) |
 | Auth | Supabase JWT + custom PAT system |
 | AI agent | Axiom (Gemini 2.5 Flash, tool-calling) |
-| Payments | Stripe (subscriptions, bets) |
+| Payments | Stripe (subscriptions, bets escrow) |
 | Deploy | Railway (backend), Vercel (frontend) |
 | Observability | Sentry |
-| Physical network | Lattice (device registry, job queue, device-key auth) |
+| Physical network | Lattice (device registry, job queue, `dk_*` auth) |
+| MCP server | Claude Desktop / VS Code integration |
 
 Source: `https://github.com/ilPez00/praxis-backend`
