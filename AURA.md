@@ -6,7 +6,7 @@
 
 ## 1. The Problem
 
-Every phone interface is, philosophically, a *distraction device* — a sequence of applications competing for attention, each demanding the user enter its context, forget everything else, and interact on its terms. The human becomes a servant of the grid.
+Every phone interface is, philosophically, a *distraction device* — a sequence of applications competing for attention, each demanding the user enter its context, forget everything else, and interact on its terms. The human becomes servant of the grid.
 
 Aura proposes the inverse: the phone becomes *transparent*. The world remains primary. The device becomes a perceptual augmentation layer — seeing what the user sees, hearing what the user hears, quietly building context, never demanding attention it hasn't earned.
 
@@ -22,210 +22,501 @@ Their answer: at the boundary of what the agent *reliably and fluently uses to t
 
 Aura's **wiki** is this argument implemented in software.
 
-Every observation — a meal photographed, a word spoken, a GPS trace, a screen glanced at — is distilled into a structured wiki page. Not archived. Distilled. A background compression model (running on-device during idle time) reads raw signal, extracts the semantically meaningful fraction, destroys the rest.
+```
+Traditional model:
+  Brain ──► Phone (passive tool, queried on demand)
 
-The result is a **growing compressed life-log** that:
-- Fits in local storage
-- Is queryable before every AI call (semantic keyword search)
-- Grows unboundedly in coverage while staying bounded in size
-- Belongs entirely to the user — never transmitted without consent
+AYU model:
+  Brain ──────────────────────────────► Intent
+    ↑                                     │
+  Wiki ◄── Phone (active observer,        │
+  (external  always-on, enriches        Action
+   memory)   every query with context)
+```
 
-When Aura answers a question, it first retrieves the 4 most relevant wiki pages from this personal knowledge base and injects them before the LLM call. The AI answers with the user's own history as context.
-
-This is not "memory." It is extended mind, implemented.
+Every observation is distilled into a wiki page. Not archived — *distilled*. A background compression model (on-device, idle time) reads raw signal, extracts the semantically meaningful fraction, destroys the rest.
 
 ---
 
-## 3. Architecture
+## 3. Full Architecture
 
 ```
-SENSORS
-  Camera → VisionAnalyzer (Gemini/GPT-4o)          — what am I looking at?
-  Mic    → SpeechClient (Deepgram/Whisper/Groq)     — what am I saying?
-  GPS    → SensorFusion                             — where am I?
-  IMU    → SensorFusion → AthleticMetrics           — what is my body doing?
-  Screen → AccessibilityService                     — what app am I using?
-         ↓
-CONTEXT BUFFER
-  locationName · scene · audio · motion · activity · foregroundApp
-  → flat contextTokens[] for downstream domain matching
-         ↓
-         ├──→ WIKI INGESTER → WikiStore (filesDir/wiki/)
-         │       ingestAudio / ingestVision / ingestNote
-         │       Jaccard dedup vs last 5 pages
-         │       → WikiPage (slug, title, body, source, confidence, tags, GPS, activity)
-         │
-         └──→ AURA SESSION
-                WikiContext.retrieve(query, 4) → [WIKI KNOWLEDGE] block
-                LocalMemoryClient (entity + conversation memory)
-                AgentLoop → OpenAiBackend (35+ provider fallback chain)
-                TtsEngine (ElevenLabs → Android TTS)
+┌─────────────────────────────────────────────────────────────────────────┐
+│  SENSORS                                                                │
+│                                                                         │
+│  Camera ──► VisionAnalyzer ──► Gemini / GPT-4o                          │
+│  Mic    ──► SpeechClient   ──► Deepgram / AssemblyAI / Groq Whisper      │
+│  GPS    ──► LocationProvider ──► SensorFusion                           │
+│  IMU    ──► SensorFusion ──► AthleticMetrics                            │
+│             (activity: RUNNING / WALKING / DRIVING / GYM / ...)         │
+│  Screen ──► AuraAccessibilityService ──► foreground app + text          │
+│  Steps  ──► StepCounter ──► SensorFusion                                │
+└─────────────────────────────────────────────────────────────────────────┘
+                                 │ all signals
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  CONTEXT BUFFER                                                         │
+│                                                                         │
+│  gps · scene · audio · motion · locationName · motionActivity           │
+│  accelerometer · gyroscope · light · proximity · stepCount              │
+│                                                                         │
+│  contextTokens() ──► flat List<String>                                  │
+│    ["gold's", "gym", "walking", "barbell", "rack", "strava"]            │
+└──────────────────────────────┬──────────────────────────────────────────┘
+                               │
+              ┌────────────────┴────────────────┐
+              ▼                                 ▼
+┌─────────────────────────┐       ┌─────────────────────────────────────┐
+│  WIKI INGESTER           │       │  AURA SESSION                       │
+│                          │       │                                     │
+│  ingestAudio(transcript) │       │  systemPrompt                       │
+│  ingestVision(scene)     │       │  + [MEMORY] (entity memory)         │
+│  ingestNote(text)        │       │  + [WIKI KNOWLEDGE]                 │
+│  ingestActivity(summary) │       │    WikiContext.retrieve(query, 4)   │
+│                          │       │  + user query                       │
+│  Jaccard dedup vs last 5 │       │         │                           │
+│  Min length: 30 chars    │       │         ▼                           │
+│  Tags auto-extracted     │       │  AgentLoop                          │
+│                          │       │  ├── OpenAiBackend (35+ providers)  │
+└──────────┬───────────────┘       │  ├── ToolRegistry (25+ tools)       │
+           │ WikiPage              │  └── TtsEngine (ElevenLabs / TTS)   │
+           ▼                       └─────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│  PRAXIS EVENT BRIDGE                                                 │
+│                                                                      │
+│  bestMatch(page, activeGoals) → score, signalTypes                   │
+│  threshold=0.50 AND signalTypes≥2 AND DebounceLedger.allow(30min)    │
+│  → PromptOverlay: "gym session → Body & Fitness [✓ Check in]"        │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## 4. The Screen as Context, Not Destination
 
-Default state in Aura is the **live camera feed**.
-
-Information overlays it the way a thermal map overlays terrain — present when needed, absent when not. There are no application icons on a blank background. There is no home screen in the traditional sense. There is the world, and there is the agent's current context projected onto it.
-
-### 4.1 HUD Layer
-
-A minimal heads-up display persists at the top of the screen:
-- Current mode (ACTIVE / PASSIVE)
-- Top goal by context relevance (colour-coded dot + name + progress %)
-- Sensor readings (GPS lock, battery, step count)
-
-### 4.2 Active vs Passive Mode
-
-| Mode | Behaviour |
-|---|---|
-| **Active** | Voice Activity Detection auto-triggers recording. 120fps AR. Auto TTS response. Vision cycle every 1–5s. Green perimeter glow. |
-| **Passive** | Tap to capture. 60s silent context refresh. Manual record only. No visual noise. |
-
-Active mode is the field mode — outdoor, moving, talking. Passive mode is the default — ambient awareness without intrusion.
-
-### 4.3 The Launcher
-
-Aura is a full Android launcher (`CATEGORY_HOME`). It replaces the default home screen.
-
 ```
-┌──────────────────────────────────┐
-│  [camera feed — always live]     │
-│  ┌──────────────────────────┐    │
-│  │  HUD: MODE · GOAL · GPS  │    │
-│  └──────────────────────────┘    │
-│                                  │
-│  [widget strip — live sensors]   │  battery, steps, speed, altitude, cost
-│                                  │
-│  [app grid — draggable, folders] │
-│                                  │
-│  [applet bar]                    │  Maps, Praxis, Calendar, Terminal...
-└──────────────────────────────────┘
-```
+BEFORE AURA:
 
-Apps are plumbing, not destinations. They live in the grid at the bottom. The screen belongs to the world.
+  ┌──────────────────────────────────────┐
+  │  [WALLPAPER — static image]          │
+  │                                      │
+  │  ┌────┐ ┌────┐ ┌────┐ ┌────┐         │
+  │  │ 📱 │ │ 📷 │ │ 🗺️ │ │ 🎵 │         │  ← destination grid
+  │  └────┘ └────┘ └────┘ └────┘         │    (each app = context switch)
+  │  ┌────┐ ┌────┐ ┌────┐ ┌────┐         │
+  │  │ 💬 │ │ 📧 │ │ 🌐 │ │ ⚙️ │         │
+  │  └────┘ └────┘ └────┘ └────┘         │
+  └──────────────────────────────────────┘
+  User attention: phone surface (dead, static)
+
+AFTER AURA:
+
+  ┌──────────────────────────────────────┐
+  │  [LIVE CAMERA FEED — always on]      │  ← world is primary
+  │                                      │
+  │  ┌──────────────────────────────┐    │
+  │  │ HUD: PASSIVE · FITNESS 52% ● │    │  ← minimal overlay
+  │  └──────────────────────────────┘    │
+  │                                      │
+  │  [widget strip]  battery · steps     │  ← live data, not icons
+  │                                      │
+  │  ┌────┐ ┌────┐ ┌────┐ ┌────┐         │
+  │  │app │ │app │ │app │ │app │         │  ← apps below the world
+  │  └────┘ └────┘ └────┘ └────┘         │
+  │  [applet bar]                        │
+  └──────────────────────────────────────┘
+  User attention: world (through the phone)
+```
 
 ---
 
-## 5. Privacy Architecture
+## 5. Active vs Passive Mode
 
-Every piece of data in Aura is local-first:
+```
+                    ┌─ ACTIVE MODE ──────────────────────────────┐
+User in field ────► │                                            │
+                    │  VAD auto-record (Voice Activity Detection) │
+(moving, talking,   │  120fps AR rendering                        │
+ outside)           │  Auto-TTS response on every reply          │
+                    │  Vision cycle: every 1–5 seconds           │
+                    │  Green perimeter glow                       │
+                    │  GPS polling: high frequency                │
+                    └────────────────────────────────────────────┘
 
-- Wiki pages → device filesystem (`filesDir/wiki/`)
-- Entity memory → device SQLite
-- Conversation history → device memory
+                    ┌─ PASSIVE MODE ──────────────────────────────┐
+User at desk ─────► │                                            │
+                    │  Tap to capture (camera or mic)             │
+(stationary,        │  60-second silent context refresh           │
+ working, quiet)    │  No auto-TTS                                │
+                    │  No automatic AR overlay                    │
+                    │  GPS polling: low frequency                 │
+                    └────────────────────────────────────────────┘
 
-Data flows to Praxis only per **explicit per-goal opt-in**, and only the goal-relevant fraction. Personal identifiers are stripped by Rachmaninov before any community-level aggregation.
-
-The compression loop (MemoryCompressor, 3h idle) runs on-device. Raw audio transcripts, vision frames, and conversation logs are destroyed after distillation. Only the distillate persists.
-
-**The phone knows everything. The cloud knows what the user chose to share.**
+Swipe: VISOR ◄──► PRAXIS ◄──► SETTINGS ◄──► MEMORY
+```
 
 ---
 
-## 6. The Second Brain — Technical Specification
+## 6. Second Brain — WikiStore
 
-### WikiPage schema
-```yaml
-slug:       gym-session-leg-day-20260518
-title:      Gym session — leg day
-source:     vision | audio | screen | conversation | compressed
-confidence: 0.87
-tags:       [fitness, training, "Body & Fitness"]
-location:   45.4654,9.1866
-activity:   WALKING
-updated:    1716057600000
-body:       >
-  User at barbell squat rack. Plates ~80kg visible. Post-workout
-  protein shake mentioned. Strava open in foreground.
+```
+LIFECYCLE OF AN OBSERVATION:
+
+  Raw signal (audio transcript / vision description / note)
+         │
+         ▼
+  WikiIngester.ingest*():
+    if len(text) < 30: skip
+    if Jaccard(text, last5) > 0.7: skip (duplicate)
+    tags = extractTags(text)
+      ["conversation","shopping","reminder","location",
+       "health","person","X"] ← auto-detected by keyword match
+         │
+         ▼
+  WikiPage:
+    ┌─────────────────────────────────────────┐
+    │ slug:       gym-session-20260518-001     │
+    │ title:      Gym session — leg day        │
+    │ source:     vision                       │
+    │ confidence: 0.91                         │
+    │ tags:       [fitness, training, ...]     │
+    │ location:   45.4654,9.1866               │
+    │ activity:   WALKING                      │
+    │ updated:    1716057600000                │
+    │ body:       "Barbell rack, 80kg..."      │
+    └─────────────────────────────────────────┘
+         │
+         ▼
+  WikiStore.upsert(page) → filesDir/wiki/{slug}.md
+         │
+         ├──► onPageIngested callback → PraxisEventBridge
+         └──► WikiContext cache invalidated
 ```
 
-### WikiStore operations
-- `upsert(page)` — writes to `filesDir/wiki/{slug}.md`
-- `search(query, n)` — keyword scoring (title match: +3pts, body: +1pt)
-- `recentBySource(source, n)` — ordered by `updated` descending
-- `ensureUniqueSlug(slug)` — appends `-2`, `-3`, etc.
+### WikiContext.retrieve(query, n=4)
 
-### WikiContext
-At every LLM call: `retrieve(query, 4)` → formats top-4 pages as:
+```python
+def retrieve(query: str, n: int = 4) -> str:
+    pages = wiki_store.all()
+    scores = []
+    for page in pages:
+        score = 0
+        query_tokens = tokenize(query)
+        for token in query_tokens:
+            if token in page.title:
+                score += 3      # title match = strong signal
+            if token in page.body:
+                score += 1
+            if token in page.tags:
+                score += 2
+        if score > 0:
+            scores.append((score, page))
+    
+    top = sorted(scores, reverse=True)[:n]
+    
+    return format_as_block(top)
+    # → "[WIKI KNOWLEDGE]\n2026-05-18 | gym-session | vision\n..."
 ```
-[WIKI KNOWLEDGE]
-2026-05-18 | gym-session | vision
-Tags: fitness, training
-User at squat rack. ~80kg. Post-workout shake...
+
 ---
-```
-This block is injected after `[MEMORY]` and before the user's query in the effective system prompt.
 
-### MemoryCompressor
-`CoroutineWorker`, scheduled every 3h on idle + battery-not-low:
-1. Reads all wiki pages older than 2h (source: audio/vision/conversation), batch 8
-2. Calls LLM: "distill to `[{fact, confidence, tags, entities}]`"
-3. Writes one compressed page (source: compressed)
-4. Deletes originals
-
-Result: wiki grows in coverage, stays bounded in storage.
-
----
-
-## 7. The Lattice — Physical World Extension
-
-Aura can dispatch physical jobs to any device registered in Praxis Lattice (see PRAXIS.md):
-
-**Voice command:** `"dispatch print_file to workshop-cnc"`
+## 7. MemoryCompressor — Background Distillation
 
 ```
-VoiceCommandRouter.parse()
-  → VoiceCmd.Dispatch(jobType="print_file", deviceSlug="workshop-cnc")
-  → PraxisApiClient.listDevices() → finds device by slug
-  → PraxisApiClient.submitJob(deviceId, "print_file")
-  → VisorScreen: shows "◈ print_file → Workshop CNC"
+COMPRESSION PIPELINE:
+
+  Raw wiki pages
+  (source: audio, vision, conversation)
+  older than 2 hours
+         │
+         │ trigger: WorkManager
+         │ constraints: IDLE + BATTERY_NOT_LOW + CONNECTED
+         │ interval: 3 hours
+         ▼
+  MemoryCompressor.doWork():
+
+    batch = wiki_store.recentBySource(["audio","vision","conversation"])
+              .filter(age > 2h)
+              .take(8)
+
+    prompt = """
+    Compress these observations into key facts.
+    Output JSON: [{fact, confidence, tags, entities}]
+    Observations:
+    {batch}
+    """
+
+    result = llm.complete(prompt)
+    facts = json.parse(result)
+
+    for fact in facts:
+        wiki_store.upsert(WikiPage(
+            source = "compressed",
+            confidence = fact.confidence,
+            body = fact.fact,
+            tags = fact.tags,
+        ))
+
+    for original in batch:
+        wiki_store.delete(original.slug)
+
+  RESULT:
+    8 raw pages (avg 200 chars each) → 1 compressed page (avg 150 chars)
+    Storage: ~93% reduction
+    Information: ~70% retained (key facts only)
 ```
 
-The phone becomes the command interface for a physical network. Aura sees the world; it can also *act* in it.
+```
+BEFORE compression (8 pages, 1,600 chars total):
+  "User said protein shake after gym"
+  "Barbell visible, user lifting"
+  "User mentioned leg day"
+  "Strava app open during workout"
+  ...
+
+AFTER compression (1 page, 120 chars):
+  fact: "Regular gym sessions, leg day focus, barbell/squat training,
+         tracks via Strava. Post-workout: protein shake."
+  confidence: 0.88
+  tags: [fitness, training, strava, nutrition]
+```
 
 ---
 
 ## 8. AI Provider Chain
 
-Aura works with zero API keys. Provider fallback (implemented in `OpenAiBackend.kt`):
-
 ```
-Tier 1 — keyed (configure in Settings)
-  Gemini 2.5 Flash · Groq Llama 3.3 70B · DeepSeek · OpenRouter
+PROVIDER SELECTION ALGORITHM:
 
-Tier 2 — keyless free proxies (zero config)
-  gptoss · g4f/auto · unfilteredapi · llm7 · ovhcloud · public Ollama
+  query arrives
+       │
+       ▼
+  for provider in PRIORITY_ORDER:
+      key = KeyManager.getKey(provider)
+      if key == null and not provider.isKeyless: continue
+      usage = KeyManager.usage[key]
+      if usage.dead: continue
+      if usage.cooldownUntil > now(): continue
 
-Tier 3 — additional keyed
-  Cerebras · Mistral · GitHub Models · NVIDIA NIM · HuggingFace
-  xAI · Together · SambaNova · Cohere · AIMLAPI · Fireworks
+      → ATTEMPT provider
+      ├── success: KeyManager.reportSuccess(provider, key)
+      │           return response
+      └── error:
+          ├── 401/403 → KeyManager.reportError("KEY_INVALID")
+          │            → usage.dead = true
+          ├── 429     → KeyManager.reportError("RATE_LIMIT")
+          │            → cooldown = min(5s << errors, 120s)
+          └── other   → KeyManager.reportError("GENERIC")
+                       → cooldown = 5s
 
-Vision
-  Gemini 2.5 Flash → GPT-4o (OpenRouter) → Gemini 1.5 Pro
+PRIORITY ORDER:
+  Tier 1 (keyed):    gemini → vertex → groq → deepseek → openrouter
+  Tier 2 (keyless):  gptoss → g4f/auto → unfilteredapi → llm7 → ovhcloud
+  Tier 3 (keyed):    cerebras → mistral → github_models → nvidia_nim
+                     → huggingface → xai → together → sambanova
+                     → cohere → aimlapi → fireworks → ...
+
+35+ providers. Silent failover. User never sees provider switches.
 ```
-
-35+ providers. If the best option fails, the next is tried silently. The user never sees a provider switch.
 
 ---
 
-## 9. Technical Stack
+## 9. Tool System
 
-| Component | Technology |
+Aura's agent can call 25+ tools. Categories:
+
+```
+FILESYSTEM          NETWORK             DEVICE
+───────────         ───────────         ──────────
+read_file           web_search          control_ui
+write_file          get_weather         get_notifications
+list_dir            find_places         reply_notification
+run_shell           reverse_geocode     phone_task
+read_source         get_navigation      phone_automation
+write_source        translate_text
+                    notify
+
+MEMORY              DEV                 MESH
+───────────         ───────────         ──────────
+memory_save         dev_task            mesh_peers
+memory_search       dev_status          mesh_delegate
+import_uberwiki     dev_task_github
+```
+
+### Tool Execution Flow
+
+```python
+def execute(name: str, args: dict) -> str:
+    # All tools follow:
+    #   1. Validate args (return "Error: X required" if missing)
+    #   2. Execute (may call network, device, filesystem)
+    #   3. Return Compress.compress(result)
+    #      ↑ LZ-string compression reduces tokens in next context window
+
+    if name == "find_places":
+        q = args.get("query") or return "Error: query required"
+        gps = AuraApp.smartPhoneContext.sensorData.location
+        lat = gps?.latitude or 0.0
+        lon = gps?.longitude or 0.0
+        return net.findPlaces(q, lat, lon)   # Google Places → Nominatim
+
+    if name == "reverse_geocode":
+        lat = args["lat"] or return "Error: lat required"
+        lon = args["lon"] or return "Error: lon required"
+        return net.reverseGeocode(lat, lon)  # Google Geocoding → Nominatim
+
+    if name == "get_weather":
+        gps = AuraApp.smartPhoneContext.sensorData.location
+        lat = args.get("lat") or gps?.latitude or 0.0
+        lon = args.get("lon") or gps?.longitude or 0.0
+        return net.getWeather(lat, lon)      # Open-Meteo → OWM
+
+    if name == "web_search":
+        q = args["query"]
+        return net.webSearch(q)              # Tavily → Brave → Serper → DDG
+
+    if name == "notify":
+        msg = args["message"]
+        title = args.get("title", "Aura")
+        return net.notify(msg, title)        # ntfy.sh → Telegram → Gotify
+```
+
+---
+
+## 10. Lattice — Physical World Extension
+
+Aura can dispatch physical jobs to any device registered in the Praxis Lattice:
+
+```
+VOICE COMMAND ROUTING:
+
+  "dispatch print_file to workshop-cnc"
+          │
+          ▼
+  VoiceCommandRouter.parse(utterance):
+
+    DISPATCH_RE = r'^(?:dispatch|send|run|execute)\s+(.+?)\s+(?:to|on)\s+(.+)$'
+
+    match: jobType="print_file", deviceSlug="workshop-cnc"
+    → underscore conversion: "print file" → "print_file"
+
+    return VoiceCmd.Dispatch(jobType="print_file", deviceSlug="workshop-cnc")
+
+          │
+          ▼
+  VisorScreen handles VoiceCmd.Dispatch:
+
+    devices = PraxisApiClient.listDevices()
+    target = devices.find(slug contains "workshop-cnc"
+                          OR name contains "workshop-cnc")
+
+    if target == null: reply "Device 'workshop-cnc' not in lattice"
+    else:
+      jobId = PraxisApiClient.submitJob(target.id, "print_file")
+      reply "◈ print_file → Workshop CNC"
+
+SUPPORTED TRIGGER WORDS:
+  dispatch / send / run / execute
+
+SYNTAX:
+  <trigger> <job_type> to <device>
+  <trigger> <job_type> on <device>
+```
+
+---
+
+## 11. Privacy Architecture
+
+```
+DATA CLASSIFICATION:
+
+  ┌──────────────────────────────────────────────────────────┐
+  │  NEVER LEAVES DEVICE                                     │
+  │                                                          │
+  │  ● Raw audio transcripts                                 │
+  │  ● Camera frames + scene descriptions                    │
+  │  ● GPS coordinates                                       │
+  │  ● Wiki pages (all sources)                              │
+  │  ● Entity memory                                         │
+  │  ● Psychological profile (Big Five, archetypes)          │
+  │  ● Compressed distillates                                │
+  └──────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────────────────────┐
+  │  PER-GOAL OPT-IN (user explicitly enables per goal)      │
+  │                                                          │
+  │  ● Goal name + progress %                                │
+  │  ● Check-in grade + notes                                │
+  │  ● Tracker data (steps, weight, etc.)                    │
+  └──────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────────────────────┐
+  │  ANONYMIZED ONLY (community wiki — no identifiers)       │
+  │                                                          │
+  │  ● will → action → effect flows                          │
+  │  ● domain + mode + grade + outcome                       │
+  │  ● Activity type (not GPS coordinates)                   │
+  └──────────────────────────────────────────────────────────┘
+```
+
+The phone knows everything. The cloud knows what the user chose to share.
+
+---
+
+## 12. Aesthetic Specification
+
+From ayu.md §1.2: *"iPhone fluidity + Anduril Lattice density."*
+
+```
+PRINCIPLES:
+  120fps               seamless transitions, no jank
+  Blur + translucency  camera feed breathes beneath UI
+  Information density  HUD does not hide data to be pretty
+  Glow effects         tapped object gets radial glow
+  Everything earns its place
+                       if element neither informs nor enables: remove
+
+COLOUR SYSTEM:
+  Active mode    green perimeter glow (#00FF88)
+  Passive mode   no border
+  Accent         #00FF88 (monochrome green on dark)
+  Background     #0A0A0A (near-black, not pure black)
+  Text           #DDDDDD (off-white, reduces eye strain)
+  Dim            #4A4A4A (secondary info)
+  Font           Monospace (data density, terminal aesthetic)
+
+HUD DENSITY SPECTRUM:
+  Minimal (passive, desk):
+    [●] PASSIVE  ·  FITNESS 52%
+
+  Dense (active, field):
+    [●] ACTIVE  ·  FITNESS 52%  ·  GPS ✓  ·  4.7 km/h  ·  8,240 steps
+    [barbell rack detected — leg press visible]
+    [WIKI: 847 pages · today: 12 added]
+```
+
+---
+
+## 13. Technical Stack
+
+| Layer | Technology |
 |---|---|
 | Language | Kotlin |
 | UI | Jetpack Compose |
-| AI inference | OpenAiBackend (35+ providers, KeyManager rotation) |
-| Vision | CameraX + Gemini Vision API |
-| STT | Deepgram / AssemblyAI / Groq Whisper |
-| TTS | ElevenLabs / Android TTS |
+| Camera | CameraX + ML Kit ObjectDetector |
+| Vision AI | Gemini Vision API / GPT-4o |
+| STT | Deepgram / AssemblyAI / Groq Whisper / Gladia / Speechmatics |
+| TTS | ElevenLabs / Fish Audio / Android TTS |
+| LLM inference | OpenAiBackend (35+ providers, KeyManager rotation) |
 | Wiki | Markdown + YAML frontmatter, local filesystem |
-| Background work | WorkManager (MemoryCompressor, DriveSyncWorker) |
-| Cloud sync | Google Drive REST API (`drive.appdata` scope) |
-| Navigation | GPS + SensorFusion + OSRM routing |
-| Maps | Google Places → Nominatim fallback |
+| Background | WorkManager (MemoryCompressor, DriveSyncWorker, CompressionScheduler) |
+| Cloud sync | Google Drive REST API (`drive.appdata`) |
+| Navigation | OSRM (turn-by-turn routing, free, no key) |
+| Geocoding | Google Places → Nominatim fallback |
+| Maps | Google Maps API → Nominatim OSM fallback |
 | Search | Tavily → Brave → Serper → DuckDuckGo |
+| Notifications | ntfy.sh → Telegram → Gotify |
+| Lattice | PraxisApiClient (listDevices, submitJob, listJobs) |
+| Memory | WikiStore (filesystem) + LocalMemoryClient (SQLite) |
 
 Source: `https://github.com/ilPez00/aura`
