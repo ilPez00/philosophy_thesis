@@ -1,0 +1,15 @@
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=2cm, auto, thick, scale=0.8]
+    \node (One) [circle, draw, fill=gray!10] {The One};
+    \node (Descent) [circle, draw, fill=blue!10, right=of One] {The Descent};
+    \node (Struggle) [circle, draw, fill=red!10, below=of Descent] {The Struggle};
+    \node (Ascent) [circle, draw, fill=green!10, left=of Struggle] {The Ascent};
+
+    \path[->] (One) edge (Descent);
+    \path[->] (Descent) edge (Struggle);
+    \path[->] (Struggle) edge (Ascent);
+    \path[->] (Ascent) edge (One);
+\end{tikzpicture}
+\caption{The Fractal Cycle of Morphological Similarity.}
+\end{figure}
