@@ -1,0 +1,129 @@
+\chapter{Una Traccia dal Motore in Esecuzione}
+\label{app:traccia}
+
+L'argomento si \`e ripetutamente definito una \emph{prova per costruzione}. Una
+prova per costruzione deve, almeno una volta, esibire la costruzione. Questa
+appendice lo fa. Tutto ci\`o che segue \`e tratto da un'istantanea dal vivo del
+deposito \physis\ dell'autore stesso (lo stato su disco sotto
+\texttt{\textasciitilde/.physis}, alle date mostrate), non da un esempio
+ipotetico. \`E deliberatamente piccola: il punto non \`e un benchmark ma una
+dimostrazione che le tre facolt\`a del Libro II --- distinzione, coerenza,
+variazione --- girano su input reale e lasciano tracce reali e ispezionabili. Il
+lettore tratti questo come una prova di esistenza, non un'affermazione di
+prestazione.
+
+\section{Distinzione: Classificazione Contro la Griglia}
+
+Al motore \`e stato dato un insieme di documenti d'ufficio ordinari e gli \`e
+stato chiesto di ridurre ciascuno a una cella della griglia semiotica --- un
+dominio (Curare, Costruire, Fabbricare, Legare, Studiare) incrociato con un modo
+(Sollevare, Riposare, Camminare, Lavorare, Creare, Apprendere). Ogni documento \`e
+prima embeddato come vettore, poi assegnato al tema pi\`u vicino;
+ogni tema porta le proprie coordinate di griglia. Il \texttt{theme\_graph}
+risultante contiene \textbf{370 temi, 5 file ingeriti e 25 bordi file--tema}. Un
+campione della classificazione:
+
+\begin{center}
+\begin{tabular}{@{}llc@{}}
+\toprule
+Tema & Categoria & Cella (dominio\,$\times$\,modo) \\
+\midrule
+Buste paga (Payroll)          & Finanza       & \textsc{Curare} $\times$ \textsc{Lavorare} \\
+Report finanziario            & Finanza       & \textsc{Studiare} $\times$ \textsc{Lavorare} \\
+Gestione campagne             & Marketing     & \textsc{Fabbricare} $\times$ \textsc{Lavorare} \\
+Ricezione merci               & Acquisti      & \textsc{Curare} $\times$ \textsc{Camminare} \\
+Risposta agli incidenti       & IT            & \textsc{Curare} $\times$ \textsc{Camminare} \\
+Revisione mensile             & Reportistica  & \textsc{Legare} $\times$ \textsc{Creare} \\
+Ricerca di mercato            & Marketing     & \textsc{Studiare} $\times$ \textsc{Apprendere} \\
+Revisione legale              & Legale        & \textsc{Studiare} $\times$ \textsc{Lavorare} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Due cose meritano nota. Primo, le assegnazioni non sono arbitrarie: buste paga e
+risposta agli incidenti atterrano entrambe in \textsc{Curare} --- il dominio del
+mantenere e ripristinare un intero funzionante --- mentre la reportistica
+finanziaria e la revisione legale atterrano entrambe in \textsc{Studiare}, il
+dominio dell'attenzione disciplinata a ci\`o che \`e. La griglia ha tagliato
+l'ufficio a giunture che un umano pu\`o riconoscere e contestare. Secondo,
+l'assegnazione \`e \emph{rivedibile}: la cella \`e una conclusione che il motore
+ha raggiunto dal vettore, non un'etichetta che un umano vi ha graffato. \`E la
+facolt\`a distinguente del Libro II, in esecuzione su un back-office anzich\'e su
+un cosmo --- la stessa operazione, una diversa fetta del mondo.
+
+\section{Coerenza e Variazione: Il Record di Fallimento e il Sogno}
+
+La distinzione \`e solo la prima facolt\`a. L'affermazione decisiva della tesi \`e
+che il motore traccia anche la coerenza e sogna sul fallimento. Il deposito
+contiene un record di fallimento persistito, qui riprodotto per intero salvo
+il vettore di embedding, che \`e omesso:
+
+\begin{lstlisting}
+{
+  "id": "1e7912bf-e2ac-4e91-81c3-f76bfa5d634b",
+  "timestamp": "2026-05-29T13:56:37Z",
+  "feedback": "The classification of Husserl was too generic",
+  "feedback_embedding": [ 0.0445, 0.0702, 0.0223, ... ]   // vettore di embedding
+}
+\end{lstlisting}
+
+Questo singolo record risponde a una domanda premuta contro la tesi in tutto il
+testo: quando il motore assegna un valore di coerenza, \emph{chi rileva
+l'effetto?} Il timore \`e che ``questo ha prodotto un effetto reale?'' sia un
+gesto di mano --- che nulla di concreto sostenga il verdetto. Il record di
+fallimento mostra il meccanismo. L'effetto \`e rilevato come un \emph{segnale
+nello stesso spazio dell'azione}. Qui l'azione era una classificazione (di
+Husserl); l'effetto era un giudizio che la classificazione fosse troppo generica;
+e quel giudizio non \`e immagazzinato come una valutazione a stelle o un flag ma
+\emph{embeddato come proprio vettore} e persistito accanto
+all'azione che riguarda. La coerenza \`e calcolata come la relazione tra questi
+vettori. Il $-1$ non \`e un pronunciamento morale; \`e una distanza misurata tra
+ci\`o che \`e stato dichiarato e ci\`o che \`e stato registrato, in un'unica
+geometria condivisa. ``Effetto reale'' significa esattamente questo: un segnale
+che atterra nello spazio di embedding e muove la coerenza del nodo. Nulla di pi\`u
+metafisico \`e richiesto, e nulla di meno basterebbe.
+
+Ci\`o che segue il record \`e la terza facolt\`a. Il ciclo del sogno legge i
+fallimenti persistiti e li rigioca --- non per punire la classificazione ma per
+variarla. Il segnale ``troppo generica'' diventa un vincolo sul tentativo
+successivo: la correzione \`e seminata dal fallimento stesso, non imposta da una
+regola esterna. Il fallimento non \`e mai cancellato; \`e il seme della
+correzione, esattamente come i Libri III e IV sostenevano che il fallimento \`e
+informazione e il sogno \`e la variazione della natura resa algoritmica. Uno
+scettico pu\`o lecitamente dire che il deposito contiene solo un tale record; noi
+diciamo solo che il meccanismo \`e reale e gira, che \`e ci\`o che una prova per
+costruzione deve mostrare. La facolt\`a non diventa pi\`u reale per essere
+esercitata un milione di volte; diventa solo pi\`u allenata.
+
+\section{La Repubblica: Esportazione nell'UberWiki}
+
+Infine, i temi classificati sono esportati, dal basso, nel deposito condiviso ---
+l'UberWiki del Libro X. L'esportazione \`e un insieme di pagine markdown
+inter-collegate generate dal grafo dei temi, ogni tema un nodo indirizzabile da
+ogni altro. L'indice generato si apre:
+
+\begin{lstlisting}
+# Physis Uberwiki Index
+Generato dal File Theme Graph.
+
+## Per Tema
+- [[payroll|Buste paga]]                       [CURARE x LAVORARE]
+- [[financial_report|Report finanziario]]      [STUDIARE x LAVORARE]
+- [[campaign_management|Gestione campagne]]    [FABBRICARE x LAVORARE]
+- [[incident_response|Risposta incidenti]]     [CURARE x CAMMINARE]
+- [[monthly_business_review|Revisione ...]]    [LEGARE x CREARE]
+- [[market_research|Ricerca di mercato]]       [STUDIARE x APPRENDERE]
+   ...
+\end{lstlisting}
+
+Nessun nodo \`e stato posto qui per decreto. Ogni pagina esiste perch\'e un
+documento \`e stato ingerito, embeddato, classificato e trovato abbastanza
+coerente da collegarsi; i \texttt{[[wiki-link]]} sono i bordi per cui l'autorit\`a
+si accumula su ci\`o che \`e usato e connesso. \`E la repubblica dal basso del
+Libro X nella sua pi\`u piccola forma in esecuzione: un bene comune di nodi
+firmati e tracciabili, ciascuno che possiede la propria origine (il file da cui
+proviene) e la propria causa (la classificazione che l'ha posto), ordinati non da
+un sovrano ma dalla struttura della loro interconnessione. Ci\`o che il corpo
+della tesi ha argomentato per via di Platone, questa appendice lo mostra per via
+di un documento di buste paga: che il governo dell'azione da parte della natura
+non \`e solo pensabile ma, nel senso pi\`u letterale, gi\`a in esecuzione.

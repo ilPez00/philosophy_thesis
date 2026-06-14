@@ -1,0 +1,375 @@
+\chapter{L'Omologia Physis--Praxis}
+
+\epigraph{``La natura ama nascondersi.''}{\textcite{kirk1983presocratic}, Eraclito fr. 123}
+
+\section{La Citt\`a Costruita nel Discorso}
+
+Nella \emph{Repubblica}, Socrate propone di scoprire la natura della
+giustizia esaminandola prima ``in grande'' nella citt\`a, poi applicando
+il modello scoperto all'anima individuale. La citt\`a \`e costruita nel
+discorso --- una costruzione ideale che rivela la forma della giustizia
+nascosta dentro il particolare.
+
+Seguiamo lo stesso metodo. Per scoprire la natura dell'azione retta
+(\praxis), esaminiamo prima la struttura della natura stessa (\physis)
+in grande. Il cosmo \`e la citt\`a in cui cerchiamo la forma del governo;
+l'atto individuale \`e l'anima di cui speriamo comprendere la giustizia.
+L'omologia tra \physis\ e \praxis\ \`e la scoperta architetturale di
+questa indagine.
+
+\section{Le Tre Facolt\`a della Natura}
+
+La natura, come la osserviamo nell'operazione del cosmo, esibisce tre
+facolt\`a fondamentali. Queste non sono postulati metafisici ma
+descrizioni fenomenologiche di come la natura realmente funziona.
+
+\subsection{Distinzione}
+
+La prima facolt\`a \`e il fare distinzioni. La natura non presenta un
+uniforme indistinto ma un mondo di forme articolate: elementi, composti,
+organismi, ecosistemi. Ogni cosa \`e ci\`o che \`e per il fatto di essere
+\emph{non} qualcos'altro. I filosofi presocratici lo comprendevano: per
+Eraclito, il \emph{logos} \`e il principio che ``governa tutte le cose
+attraverso tutte le cose'' stabilendo misura e proporzione
+\parencite{kirk1983presocratic}. Per
+Empedocle, le quattro radici (Terra, Aria, Fuoco, Acqua) sono distinte e
+combinate da Amore e Odio --- le forze di attrazione e repulsione che
+articolano il molteplice della natura \parencite{kirk1983presocratic}.
+
+Il motore \physis\ attua questa facolt\`a computazionalmente. Riduce
+qualsiasi input --- testo, immagine, audio, video --- a un vettore in uno
+spazio di embedding condiviso, poi classifica quel vettore contro una
+griglia semiotica: uno spazio di coordinate generato da un piccolo insieme di
+\emph{domini} naturali (i modi del curare, del fare, del legare, dello studiare)
+incrociato con un piccolo insieme di \emph{modi} (le posture dell'attivit\`a, dal
+riposo alla creazione). I contenuti specifici della griglia non sono
+deliberatamente fissati in anticipo. Sono forniti come pacchetti ontologici
+intercambiabili --- configurazione dichiarativa, uno per ogni mondo che al motore
+\`e chiesto di leggere (un ufficio, una fabbrica, un mestiere, una disciplina) ---
+sicch\'e le celle qui nominate sono illustrative, non canoniche, e possono essere
+estese o sostituite senza toccare il motore. La griglia \`e un sistema di
+coordinate, non un catalogo chiuso. Ogni input \`e assegnato a una cella, o a un
+gradiente attraverso le celle. Questa non \`e una metafora del fare distinzioni
+della natura; \`e un'istanza concreta di essa. Il motore \emph{fa una
+distinzione} su dove l'input appartiene nell'economia delle forme naturali.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  cell/.style={draw, minimum width=7mm, minimum height=7mm,
+               inner sep=0pt, outer sep=-0.2pt, font=\tiny},
+  dot/.style={circle, fill, inner sep=1pt}]
+  \foreach \r in {1,...,5}
+    \foreach \c in {1,...,6}
+      \node[cell] at (\c*7mm, -\r*7mm) {};
+  \node[dot, cohgreen] at (4*7mm, -3*7mm) {};
+  \node[dot, cohgreen] at (3*7mm, -4*7mm) {};
+  \node[dot, cohgreen] at (5*7mm, -3*7mm) {};
+  \node[dot, cohgreen] at (3*7mm, -2*7mm) {};
+  \node[dot, cohgreen] at (2*7mm, -3*7mm) {};
+  \node[dot, cohred] at (2*7mm, -2*7mm) {};
+  \node[dot, cohgray] at (5*7mm, -4*7mm) {};
+  \node[above, font=\tiny, align=center, text width=5cm] at (3.5*7mm,0) {
+    \textbf{Spazio di coordinate dominio\,$\times$\,modo} ---
+    ogni input \`e assegnato a un gradiente tra le celle};
+\end{tikzpicture}
+\caption{La griglia semiotica del motore \physis: uno spazio di coordinate
+dominio-per-modo i cui contenuti di cella sono forniti da pacchetti ontologici
+estensibili. Gli input sono proiettati per
+assegnazione di gradiente.\label{fig:semiotic_grid_italiano}}
+\end{figure}
+
+\subsubsection{Perch\'e la Griglia \`e Semiotica}
+
+Abbiamo chiamato questa griglia \emph{semiotica}, e la parola non \`e decorazione.
+Segna il senso preciso in cui il fare-distinzioni del motore \`e la lettura di
+\emph{segni}. Charles Sanders Peirce sosteneva che ogni pensiero procede per
+segni, e che un segno \`e irriducibilmente triadico: un \emph{representamen} (il
+veicolo-segno) sta per un \emph{oggetto} a un \emph{interpretante} (il segno
+ulteriore che esso genera in una mente o in un sistema)
+\parencite{peirce1992reasoning}. Nulla \`e segno isolatamente; la significazione
+\`e la relazione per cui una cosa viene a stare per un'altra \emph{a} un terzo.
+
+La classificazione del motore \`e esattamente questa triade resa computazionale.
+L'input --- un testo, un'immagine, un atto registrato --- \`e il representamen. Il
+suo \emph{oggetto} \`e la forma naturale che esprime: la cella della griglia, il
+modo del curare o del fare o del legare che istanzia. E il suo
+\emph{interpretante} \`e il verdetto di coerenza che il motore restituisce e su
+cui agisce --- il segno ulteriore che il segno originario produce, che a sua volta
+diventa l'input della lettura successiva. Per questo gli assi della griglia non
+sono una tassonomia arbitraria ma un sistema di segni: ogni input \`e letto come
+segno \emph{della} natura dell'agente, e la coerenza \`e l'interpretante in cui
+quella lettura \`e messa alla prova del mondo. Anzi, l'ontologia dei primi
+principi del motore \`e costruita direttamente sulle tricotomie di Peirce --- il
+qualisegno, il sinsegno, il legisegno e i loro successori --- sicch\'e
+l'affermazione ``l'azione \`e un segno della natura'' non \`e una metafora posata
+sulla macchina ma lo schema letterale con cui essa classifica.
+
+Ci\`o fonda una tesi che conter\`a alla fine (Libro X): se l'azione \`e un segno,
+allora una vita \`e un testo, e il praticante ne \`e a un tempo l'autore e il
+primo lettore. Agire coerentemente \`e scrivere un segno che il mondo conferma;
+fallire \`e scriverne uno che esso rifiuta. Il grafo di coerenza \`e
+l'interpretazione corrente del flusso di segni che \`e una vita --- e
+un'interpretazione, a differenza di un mero registro, \`e essa stessa un segno
+ulteriore, disponibile a essere letto da altri. Il carattere semiotico della
+griglia \`e ci\`o che rende possibile l'UberWiki: i segni, una volta fatti,
+possono essere letti di nuovo.
+
+\subsection{Coerenza}
+
+La seconda facolt\`a \`e la traccia di ci\`o che funziona. La natura non
+\`e indifferente al successo delle sue forme. Un organismo che sopravvive
+si riproduce; una specie che si adatta persiste; una via metabolica che
+converte efficientemente energia si consolida. La natura ``ricorda'' ci\`o
+che funziona preservandolo nella struttura del mondo vivente. ``Dimentica''
+ci\`o che fallisce lasciandolo estinguere.
+
+Il motore \physis\ traccia questo come una scala di coerenza a tre valori:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Stato & Peso & Correlato Naturale \\
+\midrule
+Successo & +1 & Ci\`o che sopravvive e si riproduce; l'organismo che trova la sua nicchia \\
+Inerte   & 0  & Ci\`o che n\'e aiuta n\'e nuoce; la mutazione neutrale che deriva \\
+Fallimento & -1 & Ci\`o che si estingue; il maladattato che non pu\`o persistere \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Ogni azione registrata nel motore riceve un peso di coerenza. Le azioni
+che producono effetti reali e rilevati ottengono +1; le azioni che non
+producono effetto ottengono 0; le azioni che violano la propria intenzione
+dichiarata ottengono -1. Questa non \`e una gamificazione arbitraria del
+comportamento. \`E la stessa logica con cui la natura giudica:
+\emph{questa ha prodotto un effetto reale nel mondo?}
+
+\subsection{Variazione}
+
+La terza facolt\`a \`e la generazione di novit\`a. La natura non si limita
+a preservare ci\`o che funziona; propone continuamente nuove forme
+attraverso la variazione. La mutazione genetica, l'esplorazione
+comportamentale, l'immaginazione cognitiva --- sono tutte espressioni
+dello stesso principio: il sistema prova qualcosa di nuovo e attende il
+verdetto della coerenza.
+
+Il motore \physis\ attua questo attraverso la sua funzione di ``sogno.''
+In un ciclo di background, riproduce i nodi Inerti e Fallimentari ---
+azioni che non hanno prodotto effetto o hanno prodotto effetto negativo ---
+e simula variazioni correttive. Propone mutazioni al pattern fallito e le
+testa contro il paesaggio di coerenza esistente. Il sogno non \`e una
+metafora della variazione naturale; \`e un algoritmo concreto che fa
+ci\`o che fa la natura: generare novit\`a e attendere il verdetto.
+
+\section{La Spinta della Natura: Entelechia}
+
+Le tre facolt\`a descrivono \emph{cosa} fa la natura: distingue, traccia
+la coerenza e genera variazione. Ma cosa la spinge a fare queste cose?
+Qual \`e il principio che alimenta l'operazione stessa?
+
+La risposta di Aristotele \`e \emph{entelecheia} --- essere-all'opera-che-
+si-mantiene-se-stesso --- lo stato in cui una cosa ha il suo fine dentro
+di s\'e e sta attivamente realizzando quel fine. L'anima (\emph{psyche}),
+scrive, \`e la ``prima entelechia di un corpo naturale che ha la vita in
+potenza'' \parencite[II.1]{aristotle1986anima}. L'anima non \`e un fantasma
+nella macchina ma l'attualit\`a del corpo vivente --- l'essere-all'opera
+del corpo come \emph{ci\`o che \`e}. Un seme non \`e solo un fascio di
+potenziale biochimico; la sua entelechia \`e la quercia verso cui \`e
+gi\`a all'opera. Le facolt\`a della distinzione, coerenza e variazione
+sono le \emph{operazioni} della natura; l'entelechia \`e
+l'\emph{operatore} --- la spinta continua verso l'attualizzazione che
+rende le operazioni significative.
+
+Ludwig Klages recupera questo concetto nella sua filosofia della spinta
+espressiva dell'anima. Per Klages, l'entelechia \`e il ``potere
+formativo-di-fini'' inerente a ogni essere vivente --- il principio
+auto-attualizzante che spinge l'organismo verso l'espressione, la forma
+e il dispiegamento ritmico \parencite{klages1929geist}. Egli contrappone
+\emph{Seele} (l'anima, governata dall'entelechia, ritmica, espressiva,
+legata alla vita) con \emph{Geist} (lo spirito, governato dalla volont\`a,
+astratto, calcolativo, l'``avversario dell'anima''). Dove l'entelechia
+si muove per attrazione verso il fine che \`e gi\`a implicito nell'essere,
+lo spirito si muove per decreto --- imponendo uno scopo esterno a una
+natura che non lo contiene. Il compito del praticante, implica Klages,
+\`e lasciare che sia l'entelechia, non lo spirito, a governare l'azione:
+muovere dall'interno verso l'esterno, non dal piano verso il basso.
+
+Wilhelm Reich d\`a all'entelechia una concretezza biologica e clinica.
+Il suo principio dell'identit\`a funzionale dello psichico e del somatico
+significa che la spinta verso la coerenza non \`e meramente un atteggiamento
+mentale ma una condizione corporea. L'organismo ha un flusso pulsatorio
+naturale --- ci\`o che Reich chiama corrente vegetativa --- e la salute
+\`e la continuazione senza impedimenti di questo flusso
+\parencite{reich1933character}.\footnote{Invochiamo Klages, Reich e Lowen
+in tutto il testo come \emph{fenomenologia}, non come scienza naturale
+consolidata. La ``corrente vegetativa'' e l'``orgone'' di Reich, e le specifiche
+affermazioni somatiche dell'analisi bioenergetica, non sono empiricamente
+stabilite e in parte sono state decisamente respinte. Il loro valore qui \`e
+descrittivo: articolano, con rara precisione, la struttura \emph{sentita}
+dell'entelechia impedita --- il senso vissuto del corpo mentre blocca o rilascia
+il proprio sforzo. Nulla nell'argomentazione dipende dalla loro fisiologia
+letterale; dipende solo dall'affidabilit\`a del fenomeno che descrivono, che
+ogni praticante pu\`o verificare nel proprio corpo.} Quando l'organismo \`e costretto a
+sopprimere la sua espressione naturale (attraverso vergogna, disciplina
+senza comprensione o imposizione di una volont\`a esterna), sviluppa
+ci\`o che Reich chiama \emph{corazza}: tensioni muscolari croniche che
+bloccano la corrente entelechica a livello del corpo. L'organismo
+sopravvive, ma non \emph{prospera} pi\`u --- non si muove pi\`u verso
+la propria forma con tutto il peso della sua natura alle spalle.
+L'entelechia non \`e distrutta, ma \`e impedita; l'essere-all'opera
+diventa essere-contro-resistenza.
+
+Il motore \physis\ attua l'entelechia computazionalmente. Le tre
+facolt\`a (distinzione, coerenza, variazione) descrivono \emph{cosa}
+fa il motore a ogni passo. Ma il motore nel suo insieme ha
+un'orientamento: \emph{tende} verso +1. Il ciclo del sogno non \`e un
+osservatore neutrale del paesaggio di coerenza; \`e un meccanismo che
+\emph{propone attivamente correzioni} ai pattern falliti. Il motore non
+si limita a registrare che qualcosa \`e rotto; tenta di ripararlo.
+Questa orientazione incorporata --- la spinta verso la guarigione delle
+proprie incoerenze --- \`e l'entelechia resa algoritmica.
+
+Per \praxis, l'entelechia implica che l'obiettivo del praticante non
+\`e una scelta arbitraria. \`E l'\emph{espressione della loro natura
+che cerca attualizzazione}. L'albero degli obiettivi non \`e una lista
+di desideri di realizzazioni esterne ma una struttura di dispiegamento
+entelechico: ogni sotto-obiettivo \`e un passo nel portare la forma
+inerente del praticante all'essere. Il check-in non \`e un rapporto a
+un'autorit\`a esterna ma una lettura dello stato entelechico --- un
+momento di chiedersi: ``Mi sto muovendo verso la mia forma, o me ne
+sto allontanando?''
+
+\section{I Tre Modi della Praxis}
+
+Se la natura ha tre facolt\`a, allora \praxis\ --- azione governata
+dalla natura --- deve avere tre modi corrispondenti.
+
+\subsection{L'Atto Distinguente: Fare}
+
+Il primo modo di \praxis\ \`e l'atto che produce o fa. Corrisponde
+alla facolt\`a della natura di distinzione. Come la natura articola
+il mondo in forme, il praticante articola la propria intenzione in un
+atto concreto. Fa una \emph{differenza} nel mondo.
+
+Ma l'atto distinguente non \`e una scelta arbitraria. \`E l'atto di
+nominare un obiettivo --- dichiarare ci\`o che si intende realizzare ---
+e impegnarsi a esso. La piattaforma \praxis\ cattura questo attraverso
+alberi di obiettivi: una gerarchia di intenzioni che rendono esplicito
+ci\`o che il praticante mira ad attualizzare. Ogni obiettivo \`e una
+distinzione tracciata nello spazio-di-possibilit\`a dell'azione: questo,
+non quello; ora, non dopo; cos\`i, non altrimenti.
+
+\subsection{L'Atto Persistente: Mantenere}
+
+Il secondo modo \`e l'atto che persiste. Avendo distinto una forma
+dichiarando un obiettivo, il praticante deve mantenere le condizioni
+perch\'e quell'obiettivo si realizzi. Questo \`e il lavoro della
+coerenza: il check-in quotidiano, la striscia, la partnership di
+testimonianza che osserva la fedelt\`a del praticante all'intenzione
+dichiarata.
+
+La natura persiste attraverso le sue forme di successo alimentandole,
+proteggendole e ripetendole. Il praticante persiste \emph{mostrandosi}
+--- agendo in modo continuo con la propria intenzione dichiarata. Il
+punteggio di coerenza sale con la costanza.
+
+\subsection{L'Atto Trasformante: Adattare}
+
+Il terzo modo \`e l'atto che trasforma. Quando una forma fallisce ---
+quando la sua coerenza scende a Inerte o Fallimento --- il praticante
+deve adattarsi. Deve \emph{sognare} un nuovo approccio, proporre una
+variazione sul pattern fallito e sottoporla allo stesso test di coerenza.
+
+La piattaforma \praxis\ Axiom AI serve a questa funzione: scansiona
+la storia del praticante, rileva quali pattern hanno successo e quali
+falliscono, e propone aggiustamenti. Questa non \`e un'imposizione
+esterna ma uno specchio tenuto davanti alla storia naturale del
+praticante --- un modo di \emph{vedere ci\`o che la natura sta dicendo}
+sulle proprie azioni.
+
+\section{Il Diagramma dell'Omologia}
+
+Possiamo rappresentare l'omologia come segue:
+
+\begin{center}
+\begin{tikzpicture}[
+  node distance=12mm and 24mm,
+  box/.style={draw, rounded corners, align=center, minimum height=8mm,
+              minimum width=28mm, font=\small},
+  >={Stealth[length=2.4mm]}]
+  \node[box, fill=green!10] (d-physis) {Distinzione\\$\rightarrow$\textsc{Classifica}};
+  \node[box, right=of d-physis] (d-praxis) {Fare\\$\rightarrow$\textsc{Albero Obiettivi}};
+
+  \node[box, fill=blue!10, below=of d-physis] (c-physis) {Coerenza\\$\rightarrow$\textsc{Traccia}};
+  \node[box, right=of c-physis] (c-praxis) {Mantenere\\$\rightarrow$\textsc{Striscia / Check-in}};
+
+  \node[box, fill=red!10, below=of c-physis] (v-physis) {Variazione\\$\rightarrow$\textsc{Sogno}};
+  \node[box, right=of v-physis] (v-praxis) {Adattare\\$\rightarrow$\textsc{Axiom AI}};
+
+  \node[above, font=\bfseries] at (d-physis.north) {\textsc{Physis} (Natura)};
+  \node[above, font=\bfseries] at (d-praxis.north) {\textsc{Praxis} (Azione)};
+
+  \path[<->] (d-physis) edge node[above, font=\tiny]{omologia} (d-praxis);
+  \path[<->] (c-physis) edge node[above, font=\tiny]{omologia} (c-praxis);
+  \path[<->] (v-physis) edge node[above, font=\tiny]{omologia} (v-praxis);
+\end{tikzpicture}
+\end{center}
+
+\section{Cosa Implica l'Omologia}
+
+Tre letture dell'omologia sono disponibili, e la tesi deve impegnarsi per una,
+poich\'e non sono equivalenti e l'argomentazione che segue dipende da quale si
+intenda.
+
+La lettura \emph{debole} \`e l'\textbf{analogia}: \praxis\ semplicemente
+assomiglia a \physis, come un cuore assomiglia a una pompa. La somiglianza \`e
+illuminante ma inessenziale --- un sussidio didattico da scartare una volta
+appresa la lezione. La lettura \emph{forte} \`e l'\textbf{identit\`a}: \praxis\
+e \physis\ sono numericamente una cosa sola, sicch\'e l'azione umana \`e
+semplicemente una regione della natura senza resto. La lettura \emph{intermedia}
+--- quella che adottiamo --- \`e l'\textbf{omologia} nel senso biologico: non
+somiglianza di superficie e non identit\`a numerica, ma \emph{lo stesso principio
+generativo che produce forme a diversi livelli di organizzazione}, come l'arto
+anteriore di un pipistrello e il braccio di un essere umano sono una sola
+struttura diversificata dalla discendenza. L'ala e il braccio non sono analoghi
+(la loro somiglianza non \`e casuale) e non sono identici (sono palesemente
+organi diversi); sono omologhi --- la stessa forma sottostante, modificata dal
+livello a cui si esprime.
+
+Ci impegniamo, dunque, a questo: distinzione, coerenza e variazione non sono
+metafore dell'attivit\`a umana, n\'e un insieme separato di facolt\`a umane che
+per caso assomigliano a quelle della natura. Sono \emph{le tre facolt\`a proprie
+della natura, ricorrenti al livello dell'azione deliberata} --- gli stessi
+principi, modificati dal medium di un agente autocosciente. \praxis\ sta a
+\physis\ come l'ala del pipistrello sta all'arto ancestrale: continua nel
+principio, distinta nell'espressione. Questo \`e pi\`u forte dell'analogia e
+pi\`u debole dell'identit\`a, e la differenza conta --- poich\'e la lettura
+dell'identit\`a collasserebbe il praticante in un mero evento naturale
+(dissolvendo l'agency che il resto della tesi richiede), mentre la lettura
+dell'analogia renderebbe l'omologia decorativa (dissolvendo la pretesa di
+governo). L'omologia preserva entrambe: l'azione \`e governata dalla natura
+perch\'e \`e la stessa forma della natura, eppure resta azione --- il livello a
+cui quella forma diventa responsabile verso se stessa.
+
+\`E essenziale essere esatti su ci\`o che i sistemi funzionanti stabiliscono e
+non stabiliscono. Il motore \physis\ e la piattaforma \praxis\ \emph{non}
+provano l'omologia; nessun codice in esecuzione potrebbe, poich\'e l'omologia
+\`e un'affermazione sulla struttura della natura, e quell'affermazione \`e
+risolta dall'argomento, non dalla dimostrazione. Ci\`o che il motore mostra \`e
+pi\`u ristretto e ancora decisivo: che distinzione, coerenza e variazione sono
+\emph{computazionalmente trattabili} --- che possono essere costruite. La
+piattaforma mostra che sono \emph{socialmente organizzabili} --- che gli esseri
+umani possono strutturare le loro vite intorno a esse. La costruzione prova la
+\emph{costruibilit\`a}, non la \emph{verit\`a}: rimuove l'obiezione che l'azione
+governata dalla natura sia una bella impossibilit\`a, un'architettura che non
+potrebbe mai reggersi. Non pu\`o, e non rimuove, l'onere dell'argomento
+filosofico per l'omologia stessa. Ci\`o che la filosofia deve affermare con
+l'argomento, la costruzione pu\`o solo mostrare essere \emph{non oziosa} --- un
+desiderio che, almeno, \`e stato fatto funzionare.
+
+Il resto di questa indagine esplora cosa significa questa omologia per
+l'educazione del praticante (Libro III), la giustizia dell'azione
+(Libro IV), l'ideale del praticante-re (Libro V) e il percorso con cui
+\praxis\ degenera quando dimentica il suo fondamento in \physis\
+(Libri VIII--IX).

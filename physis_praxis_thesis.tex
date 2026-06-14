@@ -1,0 +1,81 @@
+\documentclass[11pt,a4paper]{report}
+
+\usepackage{fontspec}
+\setmainfont{DejaVu Serif}[Scale=0.92]
+\setsansfont{DejaVu Sans}[Scale=0.92]
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+
+\usepackage[a4paper,margin=2.8cm]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,decorations.pathmorphing,decorations.pathreplacing,matrix,fit,backgrounds,trees}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{amssymb, amsmath}
+\usepackage{xspace}
+\usepackage{epigraph}
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue!60!black]{hyperref}
+\usepackage[backend=biber,style=authoryear]{biblatex}
+\addbibresource{thesis.bib}
+
+\definecolor{codebg}{gray}{0.96}
+\definecolor{rule}{gray}{0.55}
+\definecolor{cohgreen}{rgb}{0.2,0.7,0.2}
+\definecolor{cohgray}{rgb}{0.7,0.7,0.7}
+\definecolor{cohred}{rgb}{0.8,0.2,0.2}
+\definecolor{domainA}{rgb}{0.85,0.9,1.0}
+\definecolor{domainB}{rgb}{1.0,0.85,0.85}
+\definecolor{domainC}{rgb}{0.85,1.0,0.85}
+\definecolor{domainD}{rgb}{1.0,0.95,0.8}
+\definecolor{domainE}{rgb}{0.95,0.85,1.0}
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{codebg},
+  frame=single, rulecolor=\color{rule},
+  columns=fullflexible, keepspaces=true,
+  breaklines=true, showstringspaces=false,
+  xleftmargin=2pt, framexleftmargin=2pt,
+}
+
+\newcommand{\physis}{\textsc{Physis}\xspace}
+\newcommand{\praxis}{\textsc{Praxis}\xspace}
+\newcommand{\techne}{\textsc{Techne}\xspace}
+\newcommand{\machine}[1]{\textsc{#1}}
+
+\title{\bfseries The Governance of Action \\[2pt]
+\large Physis and Praxis in the Age of Technology}
+\author{Giovanni Pezzin \\[2pt]
+\large University of Verona}
+\date{June 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\tableofcontents
+
+\input{definitions.tex}
+
+\input{book1.tex}
+\input{book2.tex}
+\input{book3.tex}
+\input{book4.tex}
+\input{book5.tex}
+\input{book6.tex}
+\input{book7.tex}
+\input{book8.tex}
+\input{book9.tex}
+\input{book10.tex}
+
+\input{postscript.tex}
+
+\appendix
+\input{appendix.tex}
+
+\printbibliography
+
+\end{document}

@@ -1,0 +1,123 @@
+\chapter{A Trace from the Running Engine}
+\label{app:trace}
+
+The argument has repeatedly called itself a \emph{proof by construction}. A proof
+by construction must, at least once, exhibit the construction. This appendix does
+so. Everything below is drawn from a live snapshot of the author's own \physis\
+store (the on-disk state under \texttt{\textasciitilde/.physis}, as of the dates
+shown), not from a hypothetical example. It is deliberately small: the point is
+not a benchmark but a demonstration that the three faculties of Book II ---
+distinction, coherence, variation --- run on real input and leave real, inspectable
+traces. The reader should treat this as an existence proof, not a performance
+claim.
+
+\section{Distinction: Classification Against the Grid}
+
+The engine was given a set of ordinary office documents and asked to reduce each
+to a cell of the semiotic grid --- a domain (Heal, Construct, Fabricate, Bond,
+Study) crossed with a mode (Lift, Rest, Walk, Work, Create, Learn). Each document
+is first embedded as a vector, then assigned to the nearest theme;
+each theme carries its own grid coordinates. The resulting \texttt{theme\_graph}
+holds \textbf{370 themes, 5 ingested files, and 25 file--theme edges}. A sample of
+the classification:
+
+\begin{center}
+\begin{tabular}{@{}llc@{}}
+\toprule
+Theme & Category & Grid cell (domain\,$\times$\,mode) \\
+\midrule
+Payroll                 & Finance     & \textsc{Heal} $\times$ \textsc{Work} \\
+Financial Report        & Finance     & \textsc{Study} $\times$ \textsc{Work} \\
+Campaign Management     & Marketing   & \textsc{Fabricate} $\times$ \textsc{Work} \\
+Goods Receiving         & Procurement & \textsc{Heal} $\times$ \textsc{Walk} \\
+Incident Response       & IT          & \textsc{Heal} $\times$ \textsc{Walk} \\
+Monthly Business Review & Reporting   & \textsc{Bond} $\times$ \textsc{Create} \\
+Market Research         & Marketing   & \textsc{Study} $\times$ \textsc{Learn} \\
+Legal Review            & Legal       & \textsc{Study} $\times$ \textsc{Work} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Two things are worth noting. First, the assignments are not arbitrary: payroll and
+incident response both land in \textsc{Heal} --- the domain of maintaining and
+restoring a functioning whole --- while financial reporting and legal review both
+land in \textsc{Study}, the domain of disciplined attention to what is. The grid
+has carved the office at joints a human can recognise and contest. Second, the
+assignment is \emph{revisable}: the cell is a conclusion the engine reached from
+the vector, not a label a human stapled on. This is the distinguishing faculty of
+Book II, running on a back-office rather than on a cosmos --- the same operation,
+a different slice of the world.
+
+\section{Coherence and Variation: The Failure Record and the Dream}
+
+Distinction is only the first faculty. The decisive claim of the thesis is that
+the engine also tracks coherence and dreams over failure. The store contains a
+persisted failure record, reproduced here in full but for the embedding
+vector, which is elided:
+
+\begin{lstlisting}
+{
+  "id": "1e7912bf-e2ac-4e91-81c3-f76bfa5d634b",
+  "timestamp": "2026-05-29T13:56:37Z",
+  "feedback": "The classification of Husserl was too generic",
+  "feedback_embedding": [ 0.0445, 0.0702, 0.0223, ... ]   // embedding vector
+}
+\end{lstlisting}
+
+This single record answers a question pressed against the thesis throughout: when
+the engine assigns a coherence value, \emph{who detects the effect?} The worry is
+that ``did this produce a real effect?'' is hand-waving --- that nothing concrete
+underwrites the verdict. The failure record shows the mechanism. The effect is
+detected as a \emph{signal in the same space as the action}. Here the action was a
+classification (of Husserl); the effect was a judgment that the classification was
+too generic; and that judgment is not stored as a star-rating or a flag but
+\emph{embedded as its own vector} and persisted alongside the
+action it concerns. Coherence is computed as the relation between these vectors.
+The $-1$ is not a moral pronouncement; it is a measured distance between what was
+declared and what was registered, in a single shared geometry. ``Real effect''
+means exactly this: a signal that lands in the embedding space and moves the
+coherence of the node. Nothing more metaphysical is required, and nothing less
+would do.
+
+What follows the record is the third faculty. The dream loop reads persisted
+failures and replays them --- not to punish the classification but to vary it. The
+``too generic'' signal becomes a constraint on the next attempt: the correction
+is seeded by the failure itself, not imposed by an external rule. The failure
+is never deleted; it is the seed of the correction, exactly as Book III and Book
+IV argued that failure is information and the dream is nature's variation made
+algorithmic. A skeptic may fairly say the store holds only one such record; we
+say only that the mechanism is real and runs, which is what a proof by
+construction must show. The faculty does not become more real by being exercised a
+million times; it becomes only more practised.
+
+\section{The Republic: Export to the UberWiki}
+
+Finally, the classified themes are exported, bottom-up, into the shared store ---
+the UberWiki of Book X. The export is a set of cross-linked markdown pages
+generated from the theme graph, each theme a node addressable by every other.
+The generated index opens:
+
+\begin{lstlisting}
+# Physis Uberwiki Index
+Generated from the File Theme Graph.
+
+## By Theme
+- [[payroll|Payroll]]                         [HEAL x WORK]
+- [[financial_report|Financial Report]]       [STUDY x WORK]
+- [[campaign_management|Campaign Management]]  [FABRICATE x WORK]
+- [[incident_response|Incident Response]]      [HEAL x WALK]
+- [[monthly_business_review|Monthly ...]]      [BOND x CREATE]
+- [[market_research|Market Research]]          [STUDY x LEARN]
+   ...
+\end{lstlisting}
+
+No node was placed here by decree. Each page exists because a document was
+ingested, embedded, classified, and found coherent enough to link; the
+\texttt{[[wiki-links]]} are the edges by which authority accrues to what is used
+and connected. This is the bottom-up republic of Book X in its smallest running
+form: a commons of authored, traceable nodes, each owning its origin (the file it
+came from) and its cause (the classification that placed it), ordered not by a
+ruler but by the structure of their interconnection. What the body of the thesis
+argued by way of Plato, this appendix shows by way of a payroll document: that the
+governance of action by nature is not only thinkable but, in the most literal
+sense, already running.
