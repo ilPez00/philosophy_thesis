@@ -1,0 +1,19 @@
+# LaTeX build byproducts (regenerated on every compile). Sources (.tex/.bib) and
+# the built PDFs are tracked; everything below is noise.
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb
+*.xdv
